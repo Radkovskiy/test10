@@ -1,0 +1,20 @@
+@import './reset.css';
+
+.container {
+    margin-left: 150px;
+    /* поставить auto */
+    padding: 30px;
+}
+
+.button {
+    background-color: #cb8634;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 30px;
+    padding-right: 30px;
+    border-radius: 5px;
+}
+
+.card_button {
+    margin-top: auto;
+}
