@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components"
 import SearchBar from "../SearchBar/SearchBar";
-import { delete_product, get_selected_products } from "../../api/api";
-import Cookies from "js-cookie";
+import { get_selected_products, patch_product } from "../../api/api";
 
 const BackDrop = styled.div`
   position: fixed;
@@ -51,11 +50,12 @@ const ProductItem = styled.li`
     margin-bottom: 10px;
 `;
 
-const SelectedProductsModal = ({ allProducts, onCloseModal }) => {
+const SelectedProductsModal = ({ onCloseModal }) => {
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [filter, setFilter] = useState('')
     const [editingItem, setEditingItem] = useState(null);
-    const [toggleState, setToggleState] = useState(true);
+
+
 
     useEffect(() => {
         const handleKeyEsc = event => {
@@ -74,54 +74,17 @@ const SelectedProductsModal = ({ allProducts, onCloseModal }) => {
     }, [onCloseModal]);
 
     useEffect(() => {
-        getSelectedProductsFromCookies()
-        // getSelectedProducts()
-
-
-    }, [toggleState]);
-
-    const getSelectedProductsFromCookies = () => {
-        const modelsProducts = Cookies.get('selectedProducts')?.split(',');
-        const isArrayHasValues = modelsProducts && modelsProducts.some(model => model !== '');
-        /* 
-        проверить на пустой массив не выйдет, ибо там постоянно есть хотя 
-        бы один элемент — [""], а массив сравнивается не по значению, а по ссылке. 
-        */
-        if (isArrayHasValues) {
-            const trueProducts = allProducts.filter(product =>
-                modelsProducts.includes(product.model));
-
-            setSelectedProducts(trueProducts);
-        }
-    }
+        getSelectedProducts()
+    }, []);
 
     const getSelectedProducts = async () => {
         try {
             const { data } = await get_selected_products()
-            // console.log('GET selected :>> ', data);
-            // setSelectedProducts(data)
+            setSelectedProducts(data)
         } catch (error) {
             console.log(error);
         }
     }
-
-    const removeProduct = (deleteModel) => {
-        const modelsProducts = Cookies.get('selectedProducts');
-        if (!modelsProducts) {
-            return;
-        }
-
-        const updatedModelsProducts = modelsProducts
-            .split(',')
-            .filter(model => model !== deleteModel)
-            .join(',');
-
-        Cookies.set('selectedProducts', updatedModelsProducts);
-
-        setToggleState(p => !p) // тоглю стейт, что бы срабатывал юзефект
-    }
-
-
 
     const handleClick = (e) => {
         if (e.currentTarget === e.target) {
@@ -129,28 +92,60 @@ const SelectedProductsModal = ({ allProducts, onCloseModal }) => {
         }
     }
 
-    // const filterProducts = ()
-
-
-
-    const deleteProduct = (model) => {
-        delete_product(model)
+    const deleteProduct = async (model) => {
+        fetch('https://api.xpro.com.ua/product', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                test_id: '10',
+                model
+            }),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                getSelectedProducts()
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     }
 
     const toggleEditingQuantity = (id) => {
         setEditingItem((prevEditingItem) =>
             prevEditingItem === id ? null : id
         );
-        console.log('id :>> ', id);
+        // console.log('id :>> ', id);
     };
-    // console.log('selectedProducts :>> ', selectedProducts);
+    const changeQuantity = async (e, model) => {
+        const quantity = e.currentTarget.value
+        if (quantity <= 0) return
+
+        try {
+            const data = await patch_product({
+                quantity, model
+            });
+            getSelectedProducts()
+            console.log('patch_product :>> ', data);
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
 
     const changeFilter = e => {
         setFilter(e.currentTarget.value)
     }
 
-    const getVisibleProducts = () => selectedProducts.filter(product =>
-        product.name.toLowerCase().includes(filter.toLowerCase())
+    const getVisibleProducts = () => selectedProducts?.filter(product =>
+        product.product_info.name.toLowerCase().includes(filter.toLowerCase())
     )
     const visibleProducts = getVisibleProducts()
 
@@ -162,23 +157,26 @@ const SelectedProductsModal = ({ allProducts, onCloseModal }) => {
                     onChange={changeFilter} />
                 {selectedProducts.length === 0 && <h3>Кошик порожній</h3>}
                 <ul>
-                    {visibleProducts?.map(({ product_id, name, model, sell_price, original_price, photo, quantity }) =>
-                        <ProductItem key={product_id}>
+                    {visibleProducts?.map(({ selected_product_id, quantity, product_info: { name, model, sell_price, original_price, photo } }) =>
+                        <ProductItem key={selected_product_id}>
                             <img src={photo} alt={name} width={'200'} />
                             <h3>{name}</h3>
                             <p>Модель: {model}</p>
                             <p>Ціна покупки: {original_price}€</p>
                             <p>Ціна продажу: {sell_price}€</p>
-                            <p onDoubleClick={() => toggleEditingQuantity(product_id)}>
-                                Кількість: {editingItem === product_id ?
+                            <p onDoubleClick={() => toggleEditingQuantity(selected_product_id)}>
+                                Кількість: {editingItem === selected_product_id ?
                                     <input
                                         pattern="[0-9]*"
                                         type="number"
                                         placeholder={`${quantity}`}
-                                        onBlur={() => toggleEditingQuantity(product_id)}
+                                        onBlur={(e) => {
+                                            toggleEditingQuantity(selected_product_id)
+                                            changeQuantity(e, model)
+                                        }}
                                     /> : quantity}
                             </p>
-                            <button className="button" onClick={() => removeProduct(model)}>Видалити</button>
+                            <button className="button" onClick={() => deleteProduct(model)}>Видалити</button>
                         </ProductItem>)}
                 </ul>
             </Modal>

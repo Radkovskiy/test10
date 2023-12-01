@@ -27,7 +27,6 @@ export const get_products_all = async () => {
 export const post_products = async (body) => {
     try {
         const data = await instance.post(`product`, body)
-        console.log('POST :>> ', data);
         return data
     } catch (error) {
         console.log(error);
@@ -35,8 +34,7 @@ export const post_products = async (body) => {
 }
 export const get_selected_products = async () => {
     try {
-        const data = await instance.get(`selectedProduct`)
-        // console.log('GET selected :>> ', data);
+        const data = await instance.get(`selectedProduct?test_id=10`)
         return data
     } catch (error) {
         console.log(error);
@@ -48,7 +46,6 @@ export const delete_product = async (body) => {
         return data
     } catch (error) {
         console.log(error);
-
     }
 }
 

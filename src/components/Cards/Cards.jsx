@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { post_products } from '../../api/api';
-import Cookies from 'js-cookie';
 
 const ProductList = styled.ul`
     display: flex;
@@ -22,15 +21,8 @@ const Cards = ({ cardsArr }) => {
 
 
     const postProducts = async (model) => {
-        const savedProducts = Cookies.get('selectedProducts') ? Cookies.get('selectedProducts').split(',') : []
-        if (!savedProducts?.includes(model)) {
-            Cookies.set('selectedProducts', [...savedProducts, model].join(','))
-        }
-        console.log('savedProducts :>> ', savedProducts);
-
         try {
-            /* const { data } =  */await post_products({ model })
-
+            await post_products({ model })
         } catch (error) {
             console.log(error);
         }
@@ -40,7 +32,7 @@ const Cards = ({ cardsArr }) => {
         setVisibleCards((prevVisibleCards) => prevVisibleCards + 20);
     };
 
-     return (
+    return (
         <>
             <ProductList>
                 {cardsArr.slice(0, visibleCards).map(
@@ -68,7 +60,7 @@ const Cards = ({ cardsArr }) => {
                     )
                 )}
             </ProductList>
-            <button className='button' onClick={showMoreCards}>Показать еще 20</button>
+            <button className='button paginal_btn' onClick={showMoreCards}>Показати ще 20</button>
         </>
     );
 };
