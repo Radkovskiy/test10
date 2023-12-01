@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { delete_product, get_products_all, post_products_all } from "../api/api";
+import { get_products_all } from "../api/api";
 import Cards from "./Cards/Cards";
 import SearchBar from "./SearchBar/SearchBar";
 import SelectedProductsModal from "./SelectedProductsModal/SelectedProductsModal";
@@ -10,12 +10,8 @@ import SelectedProductsModal from "./SelectedProductsModal/SelectedProductsModal
 
 function App() {
   const [products, setProducts] = useState([]);
-  const [selectedProducts, setSelectedProducts] = useState([]);
   const [filter, setFilter] = useState('')
   const [openModal, setOpenModal] = useState(false);
-
-
-
 
   useEffect(() => {
     getProductsAll()
@@ -35,48 +31,10 @@ function App() {
     setFilter(e.currentTarget.value)
   }
 
-  console.log('products :>> ', products);
-
   const getVisibleProducts = () => products.filter(product =>
     product.name.toLowerCase().includes(filter.toLowerCase())
   )
   const visibleProducts = getVisibleProducts()
-
-
-  // console.log('visibleSelectedProducts :>> ', visibleSelectedProducts);
-
-
-  const getProductById = (id, model) => {
-    const selectedProduct = products.find(({ product_id }) => product_id === id)
-    const isProductAlreadyAdded = selectedProducts.find(({ product_id }) => product_id === id)
-
-    if (isProductAlreadyAdded) {
-      return
-    }
-
-    // cosnt { product_id, name, model, sell_price, photo } = selectedProduct;
-
-    setSelectedProducts(prev => [...prev, {
-      product_id: selectedProduct.product_id,
-      name: selectedProduct.name,
-      model: selectedProduct.model,
-      sell_price: selectedProduct.sell_price,
-      quantity: 0,
-      photo: selectedProduct.photo
-    }])
-    post_products_all({ model })
-  }
-
-  const removeProduct = (id, model) => {
-    setSelectedProducts(prev => prev.filter(({ product_id }) => product_id !== id))
-    console.log('model :>> ', model);
-    delete_product(10, model)
-  }
-
-  // const changeQuantity = (id, model, quantity) => {
-  //   setSelectedProducts(prev => )
-  // }
-
 
   const toggleModal = () => {
     setOpenModal(p => !p)
@@ -92,13 +50,11 @@ function App() {
         onClick={toggleModal}>Відкрити кошик
       </button>
       <Cards
-        cardsArr={visibleProducts}
-        addProduct={getProductById} />
+        cardsArr={visibleProducts} />
       {openModal &&
         <SelectedProductsModal
-          selectedProducts={selectedProducts}
+          allProducts={products}
           onCloseModal={toggleModal}
-          onRemoveProduct={removeProduct}
           onChange={changeFilter} />}
     </div>
   );
@@ -112,9 +68,17 @@ export default App;
 
 
 /* 
-🔴POST
-🔴PATH
-🔴количество по дабл клику
-🔴корзина
-🔴цена евро/злотый
+🔴 Запросы не работают, по ходу, из-за бека, из-за этого я попытался 
+    имитировать корзину через куки;
+      При пост запросе, мне возвращается тот объект, который и должен, 
+    то есть, пост запросы работают, но при гет запросе на корзину, 
+    всегда возвращает пустой массив, при том, что адрес запроса я 
+    указываю, как в тз и статус ответа ок200
+🔴 Поскольку корзина работает на куках, то при удалении товара, нужно 
+    обновлять страничку, что бы отрендеривался массив без удаленного 
+    объекта. А если удалить все продукты из корзины, то в корзину 
+    рендерятся объекты, что они не имеют модели. То есть поскольку 
+    куки есть, но пустые, то программа думает, что нужно отрендерить 
+    все объекты, в свойстве model которых пусто. 
+🔴 Количество по дабл клику. 
 */

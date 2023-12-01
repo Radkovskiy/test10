@@ -6,7 +6,15 @@ const instance = axios.create({
         'Content-Type': 'application/json',
         Accept: 'application/json',
     },
-})
+    transformRequest: [function (data) {
+        const newData = {
+            test_id: '10',
+            ...data,
+        };
+
+        return JSON.stringify(newData);
+    }],
+});
 
 export const get_products_all = async () => {
     try {
@@ -16,21 +24,27 @@ export const get_products_all = async () => {
         console.log(error);
     }
 }
-
-export const post_products_all = async (body) => {
-    console.log('body :>> ', body);
-
+export const post_products = async (body) => {
     try {
-        const data = await instance.post(`product`, { test_id: '10', ...body })
+        const data = await instance.post(`product`, body)
+        console.log('POST :>> ', data);
         return data
     } catch (error) {
         console.log(error);
     }
 }
-
+export const get_selected_products = async () => {
+    try {
+        const data = await instance.get(`selectedProduct`)
+        // console.log('GET selected :>> ', data);
+        return data
+    } catch (error) {
+        console.log(error);
+    }
+}
 export const delete_product = async (body) => {
     try {
-        const data = await instance.delete(`product`, { test_id: '10', ...body })
+        const data = await instance.delete(`product`, body)
         return data
     } catch (error) {
         console.log(error);
@@ -40,7 +54,7 @@ export const delete_product = async (body) => {
 
 export const patch_product = async (body) => {
     try {
-        const data = await instance.patch(`product`, { test_id: '10', ...body })
+        const data = await instance.patch(`product`, body)
         return data
     } catch (error) {
         console.log(error);

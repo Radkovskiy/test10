@@ -1,29 +1,31 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components"
 import SearchBar from "../SearchBar/SearchBar";
+import { delete_product, get_selected_products } from "../../api/api";
+import Cookies from "js-cookie";
 
 const BackDrop = styled.div`
   position: fixed;
   top: 0;
+  right: 0;
+  bottom: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  padding-top: 200px;
+  /* width: 100%; */
+  /* height: 100%; */
+  /* padding-top: 200px; */
   padding-bottom: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.8);
-  z-index: 1200;
-  /* overflow-y: scroll; */
+  z-index: 100;
 `
-
 const Modal = styled.div`
-  position: fixed;
-  top: 10px;
-  bottom: 10px;
-  /* transform: translate(-50%, -50%); */
+  /* position: fixed; */
+  /* top: 10px; */
+  /* bottom: 10px; */
   max-width: calc(100vw - 48px);
+  height: 90vh;
   padding: 50px;
   border-radius: 8px;
   background-color: #fff;
@@ -40,8 +42,18 @@ const Modal = styled.div`
     background: rgba(5, 5, 5, 0.18);
   }
 `
+const ProductItem = styled.li`
+    width: 500px;
+    border: 1px solid darkgray;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+`;
 
-const SelectedProductsModal = ({ selectedProducts, onCloseModal, onRemoveProduct }) => {
+const SelectedProductsModal = ({ allProducts, onCloseModal }) => {
+    const [selectedProducts, setSelectedProducts] = useState([]);
+    const [filter, setFilter] = useState('')
     const [editingItem, setEditingItem] = useState(null);
 
     useEffect(() => {
@@ -60,6 +72,52 @@ const SelectedProductsModal = ({ selectedProducts, onCloseModal, onRemoveProduct
         };
     }, [onCloseModal]);
 
+    useEffect(() => {
+        getSelectedProductsFromCookies()
+        getSelectedProducts()
+
+
+    }, []);
+
+    const getSelectedProductsFromCookies = () => {
+        const modelsProducts = Cookies.get('selectedProducts')?.split(',');
+        const isArrayFilled = modelsProducts && modelsProducts.some(model => model !== '');
+
+        if (isArrayFilled) {
+            const trueProducts = allProducts.filter(product =>
+                modelsProducts.includes(product.model));
+
+            setSelectedProducts(trueProducts);
+        }
+    }
+
+    const getSelectedProducts = async () => {
+        try {
+            const { data } = await get_selected_products()
+            // console.log('GET selected :>> ', data);
+            // setSelectedProducts(data)
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const removeProduct = (deleteModel) => {
+        const modelsProducts = Cookies.get('selectedProducts');
+        if (!modelsProducts) {
+            return;
+        }
+
+        const updatedModelsProducts = modelsProducts
+            .split(',')
+            .filter(model => model !== deleteModel)
+            .join(',');
+
+        Cookies.set('selectedProducts', updatedModelsProducts);
+
+    }
+
+
+
     const handleClick = (e) => {
         if (e.currentTarget === e.target) {
             onCloseModal()
@@ -68,8 +126,10 @@ const SelectedProductsModal = ({ selectedProducts, onCloseModal, onRemoveProduct
 
     // const filterProducts = ()
 
-    const removeProduct = (id, model) => {
-        onRemoveProduct(id, model)
+
+
+    const deleteProduct = (model) => {
+        delete_product(model)
     }
 
     const toggleEditingQuantity = (id) => {
@@ -78,16 +138,28 @@ const SelectedProductsModal = ({ selectedProducts, onCloseModal, onRemoveProduct
         );
         console.log('id :>> ', id);
     };
-    console.log('selectedProducts :>> ', selectedProducts);
+    // console.log('selectedProducts :>> ', selectedProducts);
+
+    const changeFilter = e => {
+        setFilter(e.currentTarget.value)
+    }
+
+    const getVisibleProducts = () => selectedProducts.filter(product =>
+        product.name.toLowerCase().includes(filter.toLowerCase())
+    )
+    const visibleProducts = getVisibleProducts()
+    console.log('visibleProducts', visibleProducts)
 
     return (
         <BackDrop onClick={handleClick}>
             <Modal>
-                <SearchBar />
+                <SearchBar
+                    value={filter}
+                    onChange={changeFilter} />
                 {selectedProducts.length === 0 && <h3>Кошик порожній</h3>}
                 <ul>
-                    {selectedProducts?.map(({ product_id, name, model, sell_price, original_price, photo, quantity }) =>
-                        <li key={product_id}>
+                    {visibleProducts?.map(({ product_id, name, model, sell_price, original_price, photo, quantity }) =>
+                        <ProductItem key={product_id}>
                             <img src={photo} alt={name} width={'200'} />
                             <h3>{name}</h3>
                             <p>Модель: {model}</p>
@@ -102,8 +174,8 @@ const SelectedProductsModal = ({ selectedProducts, onCloseModal, onRemoveProduct
                                         onBlur={() => toggleEditingQuantity(product_id)}
                                     /> : quantity}
                             </p>
-                            <button className="button" onClick={() => removeProduct(`${product_id}`, model)}>Видалити</button>
-                        </li>)}
+                            <button className="button" onClick={() => removeProduct(model)}>Видалити</button>
+                        </ProductItem>)}
                 </ul>
             </Modal>
         </BackDrop>
