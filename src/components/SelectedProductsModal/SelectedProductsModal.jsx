@@ -83,7 +83,10 @@ const SelectedProductsModal = ({ allProducts, onCloseModal }) => {
     const getSelectedProductsFromCookies = () => {
         const modelsProducts = Cookies.get('selectedProducts')?.split(',');
         const isArrayHasValues = modelsProducts && modelsProducts.some(model => model !== '');
-
+        /* 
+        проверить на пустой массив не выйдет, ибо там постоянно есть хотя 
+        бы один элемент — [""], а массив сравнивается не по значению, а по ссылке. 
+        */
         if (isArrayHasValues) {
             const trueProducts = allProducts.filter(product =>
                 modelsProducts.includes(product.model));
