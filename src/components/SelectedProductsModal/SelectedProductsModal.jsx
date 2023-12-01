@@ -55,6 +55,7 @@ const SelectedProductsModal = ({ allProducts, onCloseModal }) => {
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [filter, setFilter] = useState('')
     const [editingItem, setEditingItem] = useState(null);
+    const [toggleState, setToggleState] = useState(true);
 
     useEffect(() => {
         const handleKeyEsc = event => {
@@ -74,16 +75,16 @@ const SelectedProductsModal = ({ allProducts, onCloseModal }) => {
 
     useEffect(() => {
         getSelectedProductsFromCookies()
-        getSelectedProducts()
+        // getSelectedProducts()
 
 
-    }, []);
+    }, [toggleState]);
 
     const getSelectedProductsFromCookies = () => {
         const modelsProducts = Cookies.get('selectedProducts')?.split(',');
-        const isArrayFilled = modelsProducts && modelsProducts.some(model => model !== '');
+        const isArrayHasValues = modelsProducts && modelsProducts.some(model => model !== '');
 
-        if (isArrayFilled) {
+        if (isArrayHasValues) {
             const trueProducts = allProducts.filter(product =>
                 modelsProducts.includes(product.model));
 
@@ -114,6 +115,7 @@ const SelectedProductsModal = ({ allProducts, onCloseModal }) => {
 
         Cookies.set('selectedProducts', updatedModelsProducts);
 
+        setToggleState(p => !p) // тоглю стейт, что бы срабатывал юзефект
     }
 
 
@@ -148,7 +150,6 @@ const SelectedProductsModal = ({ allProducts, onCloseModal }) => {
         product.name.toLowerCase().includes(filter.toLowerCase())
     )
     const visibleProducts = getVisibleProducts()
-    console.log('visibleProducts', visibleProducts)
 
     return (
         <BackDrop onClick={handleClick}>
