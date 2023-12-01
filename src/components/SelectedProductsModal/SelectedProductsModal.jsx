@@ -129,11 +129,10 @@ const SelectedProductsModal = ({ onCloseModal }) => {
         if (quantity <= 0) return
 
         try {
-            const data = await patch_product({
+            await patch_product({
                 quantity, model
             });
             getSelectedProducts()
-            console.log('patch_product :>> ', data);
         } catch (error) {
             console.log(error);
         }
