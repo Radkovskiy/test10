@@ -20,14 +20,14 @@ const BackDrop = styled.div`
   z-index: 100;
 `
 const Modal = styled.div`
-  /* position: fixed; */
-  /* top: 10px; */
-  /* bottom: 10px; */
-  max-width: calc(100vw - 48px);
+  max-width: 80%;
+  min-width: 40%;
   height: 90vh;
   padding: 50px;
   border-radius: 8px;
-  background-color: #fff;
+
+  background-color: var(--background-color);
+  color: var(--primary-color);
   overflow-y: auto;
 
   &::-webkit-scrollbar {
@@ -41,14 +41,68 @@ const Modal = styled.div`
     background: rgba(5, 5, 5, 0.18);
   }
 `
+const ProductList = styled.ul`
+    display: flex;
+    flex-wrap:wrap;
+    justify-content: center;
+    gap: 10px;
+`
 const ProductItem = styled.li`
-    width: 500px;
+    display: flex;
+    flex-wrap: wrap;
+    /* justify-content: flex-end; */
+    align-content: space-between;
+    width: 300px;
+    min-height: 493px;
     border: 1px solid darkgray;
     border-radius: 10px;
     padding: 10px;
     margin-top: 10px;
     margin-bottom: 10px;
+    /* transition: 250ms cubic-bezier(0.4, 0, 0.2, 1); */
+
+   /* &:hover,
+   &:focus {
+     box-shadow: 0px 3px 1px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.08), 0px 2px 2px rgba(0, 0, 0, 0.12);
+     scale: 1.04;
+   } */
 `;
+const ImgWrapp = styled.div`
+    min-height: 63%;
+    display: flex;
+    align-items: center;
+`
+const ProductImg = styled.img`
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 10px;
+    margin-bottom: 10px;
+`
+const DescAndBtnContainer = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+`
+const ProductDescription = styled.div`
+    width: 85%;
+    margin-top: auto;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+`
+const DelBtn = styled.button`
+    margin-right: auto;
+    margin-left: auto;
+    width: 60%;
+    transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &:hover,
+    &:focus {
+        box-shadow: 0px 3px 1px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.08), 0px 2px 2px rgba(0, 0, 0, 0.12);
+        scale: 1.04;
+}
+`
 
 const SelectedProductsModal = ({ onCloseModal }) => {
     const [selectedProducts, setSelectedProducts] = useState([]);
@@ -122,7 +176,6 @@ const SelectedProductsModal = ({ onCloseModal }) => {
         setEditingItem((prevEditingItem) =>
             prevEditingItem === id ? null : id
         );
-        // console.log('id :>> ', id);
     };
     const changeQuantity = async (e, model) => {
         const quantity = e.currentTarget.value
@@ -155,29 +208,35 @@ const SelectedProductsModal = ({ onCloseModal }) => {
                     value={filter}
                     onChange={changeFilter} />
                 {selectedProducts.length === 0 && <h3>Кошик порожній</h3>}
-                <ul>
+                <ProductList>
                     {visibleProducts?.map(({ selected_product_id, quantity, product_info: { name, model, sell_price, original_price, photo } }) =>
                         <ProductItem key={selected_product_id}>
-                            <img src={photo} alt={name} width={'200'} />
-                            <h3>{name}</h3>
-                            <p>Модель: {model}</p>
-                            <p>Ціна покупки: {original_price}€</p>
-                            <p>Ціна продажу: {sell_price}€</p>
-                            <p onDoubleClick={() => toggleEditingQuantity(selected_product_id)}>
-                                Кількість: {editingItem === selected_product_id ?
-                                    <input
-                                        pattern="[0-9]*"
-                                        type="number"
-                                        placeholder={`${quantity}`}
-                                        onBlur={(e) => {
-                                            toggleEditingQuantity(selected_product_id)
-                                            changeQuantity(e, model)
-                                        }}
-                                    /> : quantity}
-                            </p>
-                            <button className="button" onClick={() => deleteProduct(model)}>Видалити</button>
+                            <ImgWrapp>
+                                <ProductImg src={photo} alt={name} width={'200'} />
+                            </ImgWrapp>
+                            <DescAndBtnContainer>
+                                <ProductDescription>
+                                    <h3>{name}</h3>
+                                    <p>Модель: {model}</p>
+                                    <p>Ціна покупки: {original_price}€</p>
+                                    <p>Ціна продажу: {sell_price}€</p>
+                                    <p onDoubleClick={() => toggleEditingQuantity(selected_product_id)}>
+                                        Кількість: {editingItem === selected_product_id ?
+                                            <input
+                                                pattern="[0-9]*"
+                                                type="number"
+                                                placeholder={`${quantity}`}
+                                                onBlur={(e) => {
+                                                    toggleEditingQuantity(selected_product_id)
+                                                    changeQuantity(e, model)
+                                                }}
+                                            /> : quantity}
+                                    </p>
+                                </ProductDescription>
+                                <DelBtn className="button" onClick={() => deleteProduct(model)}>Видалити</DelBtn>
+                            </DescAndBtnContainer>
                         </ProductItem>)}
-                </ul>
+                </ProductList>
             </Modal>
         </BackDrop>
     )

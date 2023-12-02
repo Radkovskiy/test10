@@ -1,5 +1,20 @@
 @import './reset.css';
 
+:root {
+    --background-color: #191919;
+    --primary-color: #e7e7e7;
+    --secondary-color: #cb8634
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--primary-color);
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.2;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+}
+
 .container {
     margin-left: 150px;
     /* поставить auto */
@@ -7,14 +22,11 @@
 }
 
 .button {
-    background-color: #cb8634;
+    background-color: var(--secondary-color);
     padding-top: 10px;
     padding-bottom: 10px;
     padding-left: 30px;
     padding-right: 30px;
     border-radius: 5px;
-}
-
-.card_button {
-    margin-top: auto;
+    height: 35px;
 }

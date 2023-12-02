@@ -40,6 +40,8 @@ export const get_selected_products = async () => {
         console.log(error);
     }
 }
+/* 
+// delete не работает через axios
 export const delete_product = async (body) => {
     try {
         const data = await instance.delete(`product`, body)
@@ -47,7 +49,8 @@ export const delete_product = async (body) => {
     } catch (error) {
         console.log(error);
     }
-}
+} 
+*/
 
 export const patch_product = async (body) => {
     try {
