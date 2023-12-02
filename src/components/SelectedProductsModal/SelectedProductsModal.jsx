@@ -9,9 +9,6 @@ const BackDrop = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  /* width: 100%; */
-  /* height: 100%; */
-  /* padding-top: 200px; */
   padding-bottom: 30px;
   display: flex;
   justify-content: center;
@@ -50,7 +47,6 @@ const ProductList = styled.ul`
 const ProductItem = styled.li`
     display: flex;
     flex-wrap: wrap;
-    /* justify-content: flex-end; */
     align-content: space-between;
     width: 300px;
     min-height: 493px;
@@ -59,14 +55,7 @@ const ProductItem = styled.li`
     padding: 10px;
     margin-top: 10px;
     margin-bottom: 10px;
-    /* transition: 250ms cubic-bezier(0.4, 0, 0.2, 1); */
-
-   /* &:hover,
-   &:focus {
-     box-shadow: 0px 3px 1px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.08), 0px 2px 2px rgba(0, 0, 0, 0.12);
-     scale: 1.04;
-   } */
-`;
+`
 const ImgWrapp = styled.div`
     min-height: 63%;
     display: flex;
@@ -82,7 +71,9 @@ const ProductImg = styled.img`
 const DescAndBtnContainer = styled.div`
     display: flex;
     flex-wrap: wrap;
+    align-content: space-between;
     width: 100%;
+    height: 37%;
 `
 const ProductDescription = styled.div`
     width: 85%;
@@ -95,7 +86,7 @@ const DelBtn = styled.button`
     margin-right: auto;
     margin-left: auto;
     width: 60%;
-    transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: var(--cubic-animation);
     
     &:hover,
     &:focus {

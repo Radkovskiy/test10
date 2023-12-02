@@ -6,11 +6,10 @@ const ProductList = styled.ul`
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-`;
+`
 const ProductItem = styled.li`
     display: flex;
     flex-wrap: wrap;
-    /* justify-content: flex-end; */
     align-content: space-between;
     width: 300px;
     min-height: 493px;
@@ -19,20 +18,19 @@ const ProductItem = styled.li`
     padding: 10px;
     margin-top: 10px;
     margin-bottom: 10px;
-    transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: var(--cubic-animation);
 
    &:hover,
    &:focus {
      box-shadow: 0px 3px 1px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.08), 0px 2px 2px rgba(0, 0, 0, 0.12);
      scale: 1.04;
    }
-`;
+`
 const ImgWrapp = styled.div`
     min-height: 63%;
     display: flex;
     align-items: center;
 `
-// REA-U6678 самый высокий
 const ProductImg = styled.img`
     width: 100%;
     margin-left: auto;
@@ -42,7 +40,11 @@ const ProductImg = styled.img`
 
 `
 const DescAndBtnContainer = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    align-content: space-between;
     width: 100%;
+    height: 37%;
 `
 const ProductDescription = styled.div`
     width: 85%;
@@ -53,7 +55,6 @@ const ProductDescription = styled.div`
 `
 const BtnAdd = styled.button`
     width: 100%;
-    /* margin-top: auto; */
 `
 
 
