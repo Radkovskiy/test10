@@ -1,0 +1,23 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Замените на вашу основную ветку
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Copy files to gh-pages
+      run: |
+        git branch gh-pages
+        git checkout gh-pages
+        git checkout main -- path/to/your/files
+        git add .
+        git commit -m "Update gh-pages with files from main"
+        git push origin gh-pages
