@@ -54,7 +54,8 @@ function App() {
       {openModal &&
         <SelectedProductsModal
           onCloseModal={toggleModal}
-          onChange={changeFilter} />}
+          onChange={changeFilter}
+          openModal={openModal} />}
     </div>
   );
 }

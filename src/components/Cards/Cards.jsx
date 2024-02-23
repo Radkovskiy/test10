@@ -44,7 +44,7 @@ const DescAndBtnContainer = styled.div`
     flex-wrap: wrap;
     align-content: space-between;
     width: 100%;
-    height: 37%;
+    height: 37%; //если убрать, то будет +- норм
 `
 const ProductDescription = styled.div`
     width: 85%;

@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import styled from "styled-components"
 import SearchBar from "../SearchBar/SearchBar";
 import { get_selected_products, patch_product } from "../../api/api";
+import { useSpring, animated } from 'react-spring';
+
+
 
 const BackDrop = styled.div`
   position: fixed;
@@ -95,10 +98,12 @@ const DelBtn = styled.button`
 }
 `
 
-const SelectedProductsModal = ({ onCloseModal }) => {
+const SelectedProductsModal = ({ onCloseModal, openModal }) => {
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [filter, setFilter] = useState('')
     const [editingItem, setEditingItem] = useState(null);
+    const [isVisible, setIsVisible] = useState(false);
+
 
 
 
@@ -120,7 +125,13 @@ const SelectedProductsModal = ({ onCloseModal }) => {
 
     useEffect(() => {
         getSelectedProducts()
-    }, []);
+        setIsVisible(openModal)
+    }, [openModal]);
+
+    const modalAnimation = useSpring({
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'scale(1)' : 'scale(0.8)',
+    });
 
     const getSelectedProducts = async () => {
         try {
@@ -164,10 +175,11 @@ const SelectedProductsModal = ({ onCloseModal }) => {
     }
 
     const toggleEditingQuantity = (id) => {
-        setEditingItem((prevEditingItem) =>
+        setEditingItem(prevEditingItem =>
             prevEditingItem === id ? null : id
         );
-    };
+    }
+
     const changeQuantity = async (e, model) => {
         const quantity = e.currentTarget.value
         if (quantity <= 0) return
@@ -194,41 +206,43 @@ const SelectedProductsModal = ({ onCloseModal }) => {
 
     return (
         <BackDrop onClick={handleClick}>
-            <Modal>
-                <SearchBar
-                    value={filter}
-                    onChange={changeFilter} />
-                {selectedProducts.length === 0 && <h3>Кошик порожній</h3>}
-                <ProductList>
-                    {visibleProducts?.map(({ selected_product_id, quantity, product_info: { name, model, sell_price, original_price, photo } }) =>
-                        <ProductItem key={selected_product_id}>
-                            <ImgWrapp>
-                                <ProductImg src={photo} alt={name} width={'200'} />
-                            </ImgWrapp>
-                            <DescAndBtnContainer>
-                                <ProductDescription>
-                                    <h3>{name}</h3>
-                                    <p>Модель: {model}</p>
-                                    <p>Ціна покупки: {original_price}€</p>
-                                    <p>Ціна продажу: {sell_price}€</p>
-                                    <p onDoubleClick={() => toggleEditingQuantity(selected_product_id)}>
-                                        Кількість: {editingItem === selected_product_id ?
-                                            <input
-                                                pattern="[0-9]*"
-                                                type="number"
-                                                placeholder={`${quantity}`}
-                                                onBlur={(e) => {
-                                                    toggleEditingQuantity(selected_product_id)
-                                                    changeQuantity(e, model)
-                                                }}
-                                            /> : quantity}
-                                    </p>
-                                </ProductDescription>
-                                <DelBtn className="button" onClick={() => deleteProduct(model)}>Видалити</DelBtn>
-                            </DescAndBtnContainer>
-                        </ProductItem>)}
-                </ProductList>
-            </Modal>
+            <animated.div style={modalAnimation}>
+                <Modal>
+                    <SearchBar
+                        value={filter}
+                        onChange={changeFilter} />
+                    {selectedProducts.length === 0 && <h3>Кошик порожній</h3>}
+                    <ProductList>
+                        {visibleProducts?.map(({ selected_product_id, quantity, product_info: { name, model, sell_price, original_price, photo } }) =>
+                            <ProductItem key={selected_product_id}>
+                                <ImgWrapp>
+                                    <ProductImg src={photo} alt={name} width={'200'} />
+                                </ImgWrapp>
+                                <DescAndBtnContainer>
+                                    <ProductDescription>
+                                        <h3>{name}</h3>
+                                        <p>Модель: {model}</p>
+                                        <p>Ціна покупки: {original_price}€</p>
+                                        <p>Ціна продажу: {sell_price}€</p>
+                                        <p onDoubleClick={() => toggleEditingQuantity(selected_product_id)}>
+                                            Кількість: {editingItem === selected_product_id ?
+                                                <input
+                                                    pattern="[0-9]*"
+                                                    type="number"
+                                                    placeholder={`${quantity}`}
+                                                    onBlur={(e) => {
+                                                        toggleEditingQuantity(selected_product_id)
+                                                        changeQuantity(e, model)
+                                                    }}
+                                                /> : quantity}
+                                        </p>
+                                    </ProductDescription>
+                                    <DelBtn className="button" onClick={() => deleteProduct(model)}>Видалити</DelBtn>
+                                </DescAndBtnContainer>
+                            </ProductItem>)}
+                    </ProductList>
+                </Modal>
+            </animated.div>
         </BackDrop>
     )
 }

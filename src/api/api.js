@@ -40,6 +40,15 @@ export const get_selected_products = async () => {
         console.log(error);
     }
 }
+export const patch_product = async (body) => {
+    try {
+        const data = await instance.patch(`product`, body)
+        return data
+    } catch (error) {
+        console.log(error);
+
+    }
+}
 /* 
 // delete не работает через axios
 export const delete_product = async (body) => {
@@ -52,12 +61,3 @@ export const delete_product = async (body) => {
 } 
 */
 
-export const patch_product = async (body) => {
-    try {
-        const data = await instance.patch(`product`, body)
-        return data
-    } catch (error) {
-        console.log(error);
-
-    }
-}
